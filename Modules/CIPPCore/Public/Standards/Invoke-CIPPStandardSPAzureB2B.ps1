@@ -13,11 +13,12 @@ function Invoke-CIPPStandardSPAzureB2B {
         CAT
             SharePoint Standards
         TAG
-            "lowimpact"
             "CIS"
         ADDEDCOMPONENT
         IMPACT
             Low Impact
+        ADDEDDATE
+            2024-07-09
         POWERSHELLEQUIVALENT
             Set-SPOTenant -EnableAzureADB2BIntegration \$true
         RECOMMENDEDBY
@@ -25,10 +26,11 @@ function Invoke-CIPPStandardSPAzureB2B {
         UPDATECOMMENTBLOCK
             Run the Tools\Update-StandardsComments.ps1 script to update this comment block
     .LINK
-        https://docs.cipp.app/user-documentation/tenant/standards/edit-standards
+        https://docs.cipp.app/user-documentation/tenant/standards/list-standards/sharepoint-standards#low-impact
     #>
 
     param($Tenant, $Settings)
+
     $CurrentState = Get-CIPPSPOTenant -TenantFilter $Tenant |
         Select-Object -Property EnableAzureADB2BIntegration
 
@@ -62,5 +64,11 @@ function Invoke-CIPPStandardSPAzureB2B {
 
     if ($Settings.report -eq $true) {
         Add-CIPPBPAField -FieldName 'AzureB2B' -FieldValue $StateIsCorrect -StoreAs bool -Tenant $tenant
+        if ($StateIsCorrect) {
+            $FieldValue = $true
+        } else {
+            $FieldValue = $CurrentState
+        }
+        Set-CIPPStandardsCompareField -FieldName 'standards.SPAzureB2B' -FieldValue $FieldValue -Tenant $Tenant
     }
 }
